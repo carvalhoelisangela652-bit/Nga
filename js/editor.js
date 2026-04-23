@@ -32,6 +32,9 @@ function renderEditorTab(){
     fetchGitHubFileTree(STATE._fileTreePath||"");
     if(STATE.activeFile && STATE.files[STATE.activeFile]!==undefined){
       loadFileInEditor(STATE.activeFile);
+    } else {
+      // Try to load a default file
+      loadDefaultFile();
     }
     loadEditorCommits();
   }
@@ -175,13 +178,205 @@ function getFileIcon(name){
   return icons[ext]||"📄";
 }
 
-/* ── LOAD FILE FROM GITHUB ──────────────────────────────────────── */
+/* ── LEFT PANEL SWITCH ──────────────────────────────────────────── */
+function switchLeftPanel(panel, btn){
+  const tabs = document.querySelectorAll('.lp-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+
+  const contents = document.querySelectorAll('.lp-content');
+  contents.forEach(c => c.classList.remove('active'));
+
+  _el(`lp-${panel}`).classList.add('active');
+
+  if(panel === 'skills'){
+    loadMiniSkills();
+  }
+}
+
+/* ── MINI SKILLS ─────────────────────────────────────────────────── */
+function loadMiniSkills(){
+  const grid = _el('skills-mini-grid');
+  if(!grid) return;
+  const skills = [
+    {name: 'Code Review', icon: 'fas fa-search', desc: 'Revisar código'},
+    {name: 'Optimize', icon: 'fas fa-tachometer-alt', desc: 'Otimizar performance'},
+    {name: 'Debug', icon: 'fas fa-bug', desc: 'Encontrar bugs'},
+    {name: 'Test', icon: 'fas fa-vial', desc: 'Gerar testes'},
+    {name: 'Document', icon: 'fas fa-book', desc: 'Documentar código'},
+    {name: 'Refactor', icon: 'fas fa-recycle', desc: 'Refatorar código'},
+    {name: 'Security', icon: 'fas fa-shield-alt', desc: 'Auditoria de segurança'},
+    {name: 'Performance', icon: 'fas fa-chart-line', desc: 'Análise de performance'},
+    {name: 'Accessibility', icon: 'fas fa-universal-access', desc: 'Acessibilidade'},
+    {name: 'SEO', icon: 'fas fa-search-plus', desc: 'Otimização SEO'},
+    {name: 'Deploy', icon: 'fas fa-rocket', desc: 'Preparar deploy'},
+    {name: 'Backup', icon: 'fas fa-save', desc: 'Criar backup'},
+  ];
+  grid.innerHTML = skills.map(s => `
+    <div class="skill-mini-item animate-fade-in-up" onclick="runSkill('${s.name}')">
+      <i class="${s.icon}"></i>
+      <div>
+        <div style="font-weight:600;font-size:10px;">${s.name}</div>
+        <div style="font-size:8px;color:var(--text-dim);">${s.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function runSkill(skillName){
+  if(!STATE.activeFile){
+    showToast('Selecione um arquivo primeiro','error');
+    return;
+  }
+  // Placeholder for skill execution
+  showToast(`Executando skill: ${skillName}`,'info');
+}
+
+/* ── EDITOR TOOLS ───────────────────────────────────────────────── */
+function searchInCode(){
+  const searchTerm = prompt('Buscar no código:');
+  if(!searchTerm) return;
+  const editor = _el('code-editor');
+  const content = editor.value;
+  const index = content.indexOf(searchTerm);
+  if(index !== -1){
+    editor.focus();
+    editor.setSelectionRange(index, index + searchTerm.length);
+    showToast(`Encontrado na posição ${index}`,'success');
+  } else {
+    showToast('Texto não encontrado','error');
+  }
+}
+
+function replaceInCode(){
+  const searchTerm = prompt('Texto a substituir:');
+  if(!searchTerm) return;
+  const replaceTerm = prompt('Substituir por:');
+  const editor = _el('code-editor');
+  const content = editor.value;
+  const newContent = content.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+  if(newContent !== content){
+    editor.value = newContent;
+    onEditorInput();
+    showToast(`Substituído ${searchTerm} por ${replaceTerm}`,'success');
+  } else {
+    showToast('Texto não encontrado','error');
+  }
+}
+
+function toggleComment(){
+  const editor = _el('code-editor');
+  const lines = editor.value.split('\n');
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const startLine = editor.value.substr(0, start).split('\n').length - 1;
+  const endLine = editor.value.substr(0, end).split('\n').length - 1;
+
+  for(let i = startLine; i <= endLine; i++){
+    if(lines[i].trim().startsWith('//')){
+      lines[i] = lines[i].replace('//', '');
+    } else {
+      lines[i] = '//' + lines[i];
+    }
+  }
+  editor.value = lines.join('\n');
+  onEditorInput();
+}
+
+function duplicateLine(){
+  const editor = _el('code-editor');
+  const lines = editor.value.split('\n');
+  const cursorPos = editor.selectionStart;
+  const lineIndex = editor.value.substr(0, cursorPos).split('\n').length - 1;
+  lines.splice(lineIndex + 1, 0, lines[lineIndex]);
+  editor.value = lines.join('\n');
+  onEditorInput();
+}
+
+function deleteLine(){
+  const editor = _el('code-editor');
+  const lines = editor.value.split('\n');
+  const cursorPos = editor.selectionStart;
+  const lineIndex = editor.value.substr(0, cursorPos).split('\n').length - 1;
+  if(lines.length > 1){
+    lines.splice(lineIndex, 1);
+    editor.value = lines.join('\n');
+    onEditorInput();
+  }
+}
+
+function moveLineUp(){
+  const editor = _el('code-editor');
+  const lines = editor.value.split('\n');
+  const cursorPos = editor.selectionStart;
+  const lineIndex = editor.value.substr(0, cursorPos).split('\n').length - 1;
+  if(lineIndex > 0){
+    [lines[lineIndex], lines[lineIndex - 1]] = [lines[lineIndex - 1], lines[lineIndex]];
+    editor.value = lines.join('\n');
+    onEditorInput();
+  }
+}
+
+function moveLineDown(){
+  const editor = _el('code-editor');
+  const lines = editor.value.split('\n');
+  const cursorPos = editor.selectionStart;
+  const lineIndex = editor.value.substr(0, cursorPos).split('\n').length - 1;
+  if(lineIndex < lines.length - 1){
+    [lines[lineIndex], lines[lineIndex + 1]] = [lines[lineIndex + 1], lines[lineIndex]];
+    editor.value = lines.join('\n');
+    onEditorInput();
+  }
+}
+function runMiniTerminalCommand(){
+  const input = _el('mini-terminal-input');
+  const output = _el('mini-terminal-output');
+  const cmd = input.value.trim();
+  if(!cmd) return;
+
+  output.innerHTML += `<div style="color:var(--accent);">$ ${cmd}</div>`;
+  input.value = '';
+
+  // Simulate command execution
+  setTimeout(() => {
+    output.innerHTML += `<div>Comando executado: ${cmd}</div>`;
+    output.scrollTop = output.scrollHeight;
+  }, 500);
+}
+async function loadDefaultFile(){
+  const defaultFiles = ['README.md', 'readme.md', 'index.html', 'index.js', 'main.py', 'app.py', 'package.json'];
+  for(const file of defaultFiles){
+    try {
+      const branch = KEYS.githubBranch||STATE.ghStatus.branch||"main";
+      const res = await fetch(`https://api.github.com/repos/${KEYS.githubRepo}/contents/${encodeURIComponent(file)}?ref=${branch}`,
+        {headers:{Authorization:"Bearer "+KEYS.github, Accept:"application/vnd.github+json"}});
+      if(res.ok){
+        const data = await res.json();
+        if(data.encoding === "base64"){
+          const content = atob(data.content.replace(/\n/g,""));
+          STATE.files[file] = content;
+          STATE._fileShas[file] = data.sha;
+          loadFileInEditor(file);
+          openFileTab(file);
+          addLog("success","EDITOR",`Arquivo padrão carregado: ${file}`);
+          return;
+        }
+      }
+    } catch(e){
+      // Continue to next file
+    }
+  }
+  // If no default file found, show message
+  showFileListMsg("Selecione um arquivo no Explorer para começar.","var(--text-dim)");
+}
 async function loadFileFromGitHub(path){
   if(STATE.files[path]!==undefined){ loadFileInEditor(path); openFileTab(path); return; }
 
   const branch = KEYS.githubBranch||STATE.ghStatus.branch||"main";
   const fn = _el("editor-filename"); if(fn) fn.textContent = path+" (carregando...)";
-
+  // Add loading animation
+  const editor = _el("code-editor");
+  if(editor) editor.classList.add('animate-pulse');
   try {
     const res  = await fetch(`https://api.github.com/repos/${KEYS.githubRepo}/contents/${encodeURIComponent(path)}?ref=${branch}`,
       {headers:{Authorization:"Bearer "+KEYS.github, Accept:"application/vnd.github+json"}});
@@ -202,6 +397,9 @@ async function loadFileFromGitHub(path){
     loadFileInEditor(path);
     openFileTab(path);
     fetchGitHubFileTree(STATE._fileTreePath||"");
+    // Remove loading animation
+    const editor = _el("code-editor");
+    if(editor) editor.classList.remove('animate-pulse');
   } catch(e){
     if(fn) fn.textContent = "Erro ao carregar: "+path;
     addLog("error","EDITOR","Erro: "+e.message);

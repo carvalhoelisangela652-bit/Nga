@@ -31,8 +31,9 @@
   --purple-dim: rgba(156,125,245,.10);
   --accent-dim: rgba(47,120,240,.10);
 
-  --font-mono: 'JetBrains Mono','Fira Code',ui-monospace,monospace;
-  --font-ui:   'Syne','Inter',system-ui,sans-serif;
+  --font-mono: 'JetBrains Mono','IBM Plex Mono','Fira Code',ui-monospace,monospace;
+  --font-ui:   'Syne','Montserrat','Inter','Roboto',system-ui,sans-serif;
+  --font-display: 'Outfit','Poppins','Lato','Raleway',serif;
 
   --sidebar-w: 220px;
   --header-h:  52px;
@@ -41,6 +42,14 @@
   --radius-lg: 12px;
 
   --transition: all .2s ease;
+  --transition-fast: all .1s ease;
+  --transition-slow: all .4s ease;
+
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-xl: 0 8px 32px rgba(0,0,0,0.5);
+  --glass: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
 }
 
 /* ── RESET ──────────────────────────────────────────────────────── */
@@ -48,13 +57,26 @@
 html { height: 100%; }
 body {
   min-height: 100vh;
-  background: var(--bg);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 50%, var(--bg3) 100%);
   color: var(--text);
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.6;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><defs><filter id="noise"><feTurbulence baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter></defs><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.02"/></svg>');
+  pointer-events: none;
+  z-index: 0;
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -475,7 +497,156 @@ input, select, textarea { font-family: var(--font-mono); }
 }
 .btn-secondary:hover { background: var(--bg4); border-color: var(--border2); color: var(--text); }
 
-/* ── SIDEBAR OVERLAY ─────────────────────────────────────────────── */
+/* ── ECOSYSTEM COMPONENTS ──────────────────────────────────────── */
+.extension-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: var(--transition);
+}
+
+.extension-card:hover {
+  background: var(--bg4);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.ext-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ext-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ext-category {
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ext-meta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 10px;
+  color: var(--text-mid);
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  background: var(--bg3);
+  margin-bottom: 4px;
+}
+
+.status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.status.online {
+  background: var(--green);
+}
+
+.status.away {
+  background: var(--yellow);
+}
+
+.status.offline {
+  background: var(--red);
+}
+
+.chat-messages {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.chat-input {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 11px;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ── VR/AR CANVAS ───────────────────────────────────────────────── */
+#vr-ar-canvas {
+  width: 100%;
+  height: 400px;
+  background: var(--bg2);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* ── GLASS MORPHISM EFFECTS ────────────────────────────────────── */
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+/* ── ANIMATIONS FOR ECOSYSTEM ──────────────────────────────────── */
+@keyframes hologram {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.hologram-effect {
+  animation: hologram 3s ease-in-out infinite;
+  background: linear-gradient(45deg, var(--cyan), var(--purple), var(--accent));
+  background-size: 200% 200%;
+  animation: hologram 3s ease-in-out infinite;
+}
+
+/* ── RESPONSIVE FOR ECOSYSTEM ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .extension-card {
+    padding: 8px;
+  }
+
+  .ext-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #vr-ar-canvas {
+    height: 300px;
+  }
+}
 #sidebar-overlay {
   display: none;
   position: fixed;

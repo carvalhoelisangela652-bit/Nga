@@ -1,0 +1,142 @@
+{
+  "name": "titan-ecosystem",
+  "version": "6.0.0",
+  "description": "The Largest Development Ecosystem Ever Created",
+  "main": "index.html",
+  "author": "TITAN Ecosystem Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/titan-ecosystem/core.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "start": "http-server . -p 3000 -c-1",
+    "dev": "http-server . -p 3000 -c-1 --cors",
+    "build": "echo 'Build process for production deployment'",
+    "deploy": "echo 'Deploy to production environment'",
+    "test": "echo 'Run test suite'",
+    "lint": "echo 'Run linting'",
+    "create-extension": "node scripts/create-extension.js",
+    "setup": "npm install && npm run setup-deps",
+    "setup-deps": "echo 'Setting up development dependencies'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "simple-peer": "^9.11.1",
+    "web3": "^1.10.0",
+    "three": "^0.158.0",
+    "aframe": "^1.4.2",
+    "chart.js": "^4.4.0",
+    "monaco-editor": "^0.45.0",
+    "marked": "^9.1.6",
+    "highlight.js": "^11.9.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "webpack": "^5.88.2",
+    "babel": "^6.23.0",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.3"
+  },
+  "ecosystem": {
+    "ai": {
+      "providers": ["anthropic", "openai", "google", "meta", "mistral", "huggingface"],
+      "defaultProvider": "anthropic",
+      "models": {
+        "anthropic": ["claude-sonnet-4-6", "claude-opus-4-6", "claude-haiku-4-5"],
+        "openai": ["gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"],
+        "google": ["gemini-pro", "gemini-pro-vision"],
+        "meta": ["llama-2-70b", "llama-2-13b"],
+        "mistral": ["mistral-large", "mistral-medium"],
+        "huggingface": ["custom-models"]
+      }
+    },
+    "cloud": {
+      "providers": ["aws", "azure", "gcp", "digitalocean", "linode", "heroku"],
+      "regions": {
+        "aws": ["us-east-1", "eu-west-1", "ap-southeast-1"],
+        "azure": ["East US", "West Europe", "Southeast Asia"],
+        "gcp": ["us-central1", "europe-west1", "asia-southeast1"]
+      }
+    },
+    "blockchain": {
+      "networks": ["ethereum", "polygon", "solana", "bnb", "avalanche"],
+      "wallets": ["metamask", "walletconnect", "coinbase"],
+      "contracts": []
+    },
+    "collaboration": {
+      "features": ["webrtc", "socket.io", "voice", "video", "screen-share"],
+      "maxUsers": 50
+    },
+    "marketplace": {
+      "categories": ["ai", "cloud", "devops", "security", "ui", "data", "blockchain", "vrar"],
+      "extensions": [],
+      "commission": 0.7
+    },
+    "analytics": {
+      "metrics": ["commits", "deployments", "users", "performance", "errors"],
+      "retention": "1y"
+    },
+    "vrar": {
+      "frameworks": ["aframe", "three.js", "webxr"],
+      "devices": ["oculus", "htc-vive", "hololens", "mobile-vr"]
+    },
+    "integrations": {
+      "version-control": ["github", "gitlab", "bitbucket", "azure-devops"],
+      "ci-cd": ["jenkins", "github-actions", "circleci", "travis-ci"],
+      "communication": ["slack", "discord", "teams"],
+      "project-management": ["jira", "trello", "asana", "linear"],
+      "documentation": ["notion", "confluence", "gitbook"],
+      "monitoring": ["datadog", "new-relic", "sentry"],
+      "security": ["snyk", "sonarqube", "owasp"]
+    }
+  },
+  "features": {
+    "ai": true,
+    "cloud": true,
+    "blockchain": true,
+    "collaboration": true,
+    "marketplace": true,
+    "analytics": true,
+    "vrar": true,
+    "security": true,
+    "monetization": true,
+    "enterprise": true
+  },
+  "limits": {
+    "free": {
+      "aiQueries": 100,
+      "deployments": 5,
+      "collaborators": 3,
+      "extensions": 10
+    },
+    "pro": {
+      "aiQueries": 1000,
+      "deployments": 50,
+      "collaborators": 10,
+      "extensions": 100
+    },
+    "enterprise": {
+      "aiQueries": -1,
+      "deployments": -1,
+      "collaborators": -1,
+      "extensions": -1
+    }
+  },
+  "branding": {
+    "name": "TITAN Ecosystem",
+    "tagline": "The Largest Development Universe Ever Created",
+    "logo": "assets/logo.svg",
+    "colors": {
+      "primary": "#2f78f0",
+      "secondary": "#d97757",
+      "accent": "#0fd98a",
+      "background": "#080c12"
+    }
+  }
+}
