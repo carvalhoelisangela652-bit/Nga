@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="theme-color" content="#080c12"/>
+  <meta name="description" content="TITAN v5 — Super DevOps Agent com GitHub, Claude AI, Render, Supabase"/>
+  <title>⚡ TITAN v5 — Super DevOps Agent</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            titan: {
+              bg:"#080c12",bg2:"#0d1420",bg3:"#111c2e",bg4:"#172336",
+              border:"#192840",border2:"#1f3352",
+              copper:"#d97757",green:"#0fd98a",red:"#f43060",
+              yellow:"#f5a623",cyan:"#18d4f0",purple:"#9c7df5",
+              accent:"#2f78f0",text:"#c4d4e8",mid:"#6888aa",dim:"#2e4560",
+            }
+          },
+          fontFamily: {
+            mono:["JetBrains Mono","Fira Code","monospace"],
+            display:["Syne","system-ui","sans-serif"],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <!-- FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+
+  <!-- Marked (markdown) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+
+  <!-- Highlight.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+
+  <!-- TITAN v5 CSS -->
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/agent.css"/>
+  <link rel="stylesheet" href="css/editor.css"/>
+  <link rel="stylesheet" href="css/skills.css"/>
+
+  <!-- TITAN AGENT ICON ANIMATIONS -->
+  <style>
+    @keyframes titanFloat {
+      0%,100%{transform:translateY(0) rotateY(-8deg)}
+      25%{transform:translateY(-6px) rotateY(5deg)}
+      50%{transform:translateY(-10px) rotateY(10deg)}
+      75%{transform:translateY(-4px) rotateY(-2deg)}
+    }
+    @keyframes titanFloatSm {
+      0%,100%{transform:translateY(0) rotateY(-6deg)}
+      50%{transform:translateY(-3px) rotateY(6deg)}
+    }
+    @keyframes visorPulse {
+      0%,100%{opacity:.85} 50%{opacity:1}
+    }
+    @keyframes crestSway {
+      0%,100%{transform-origin:bottom center;transform:rotate(-2deg)}
+      50%{transform:rotate(2deg)}
+    }
+    .titan-icon-wrap { perspective:600px; display:inline-flex; }
+    .titan-icon-3d   { animation:titanFloat 5s ease-in-out infinite; transform-style:preserve-3d; }
+    .titan-icon-3d-sm{ animation:titanFloatSm 4s ease-in-out infinite; transform-style:preserve-3d; }
+    .titan-visor     { animation:visorPulse 2.5s ease-in-out infinite; }
+    .titan-crest     { animation:crestSway 3s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+<!-- ══ THREE.JS CANVAS BG ════════════════════════════════════════ -->
+<canvas id="three-canvas"></canvas>
+
+<!-- ══ TOAST CONTAINER ═══════════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<div id="app">
+
+  <!-- ══ SETUP SCREEN ════════════════════════════════════════════ -->
+  <div id="setup-screen" class="show">
+    <div class="setup-card">
+      <div class="setup-logo">
+        <div class="titan-icon-wrap">
+        <div class="titan-icon-3d">
+        <svg viewBox="0 0 80 100" width="72" height="90" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 3px 12px rgba(217,119,87,0.5)) drop-shadow(0 1px 4px rgba(0,0,0,0.5))">
+          <defs>
+            <linearGradient id="sl-rim" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F5D060"/><stop offset="40%" stop-color="#d97757"/><stop offset="80%" stop-color="#8B5010"/><stop offset="100%" stop-color="#F0C040"/></linearGradient>
+            <linearGradient id="sl-body" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a2e58"/><stop offset="55%" stop-color="#0c1830"/><stop offset="100%" stop-color="#060c18"/></linearGradient>
+            <linearGradient id="sl-helm" x1="0%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#C8DCF0"/><stop offset="55%" stop-color="#7A94AA"/><stop offset="100%" stop-color="#3A5060"/></linearGradient>
+            <linearGradient id="sl-crest" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#E74C3C"/><stop offset="100%" stop-color="#7B241C"/></linearGradient>
+            <linearGradient id="sl-visor" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="rgba(0,200,255,0.9)"/><stop offset="100%" stop-color="rgba(0,90,190,0.5)"/></linearGradient>
+            <filter id="sl-glow-g"><feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="b"/><feFlood flood-color="#d97757" flood-opacity="0.6" result="c"/><feComposite in="c" in2="b" operator="in" result="s"/><feComposite in="SourceGraphic" in2="s" operator="over"/></filter>
+            <filter id="sl-glow-c"><feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/><feFlood flood-color="#00D4FF" flood-opacity="0.7" result="c"/><feComposite in="c" in2="b" operator="in" result="s"/><feComposite in="SourceGraphic" in2="s" operator="over"/></filter>
+          </defs>
+          <!-- Shield rim -->
+          <path d="M40 3 L74 16 L74 52 Q74 82 40 97 Q6 82 6 52 L6 16 Z" fill="url(#sl-rim)"/>
+          <!-- Shield body -->
+          <path d="M40 7 L70 19 L70 52 Q70 78 40 92 Q10 78 10 52 L10 19 Z" fill="url(#sl-body)"/>
+          <!-- Inner gold border -->
+          <path d="M40 11 L66 22 L66 52 Q66 74 40 87 Q14 74 14 52 L14 22 Z" fill="none" stroke="rgba(217,119,87,0.4)" stroke-width="0.8"/>
+          <!-- Shine -->
+          <path d="M40 7 L70 19 L70 52 Q70 78 40 92 Q10 78 10 52 L10 19 Z" fill="rgba(255,255,255,0.07)"/>
+          <!-- Corner dots -->
+          <circle cx="40" cy="14" r="1.8" fill="#d97757" filter="url(#sl-glow-g)"/>
+          <!-- Body armor -->
+          <rect x="30" y="63" width="20" height="18" rx="2.5" fill="url(#sl-helm)" opacity="0.9"/>
+          <line x1="40" y1="63" x2="40" y2="73" stroke="#3A5060" stroke-width="0.6"/>
+          <!-- Neck -->
+          <rect x="37" y="58" width="6" height="7" rx="2" fill="#AABCCC"/>
+          <!-- Shoulders -->
+          <ellipse cx="27" cy="66" rx="5" ry="3.5" fill="#AABCCC" stroke="#7A94AA" stroke-width="0.5"/>
+          <ellipse cx="53" cy="66" rx="5" ry="3.5" fill="#9AAABB" stroke="#7A94AA" stroke-width="0.5"/>
+          <!-- Helmet dome -->
+          <path d="M24 55 Q24 38 40 36 Q56 38 56 55 L54 60 Q46 63 40 64 Q34 63 26 60 Z" fill="url(#sl-helm)" stroke="#5A7080" stroke-width="0.6"/>
+          <!-- Cheeks -->
+          <path d="M26 51 Q22 53 23 59 Q26 62 29 61 L29 53 Z" fill="#7A94AA" stroke="#4A6070" stroke-width="0.5"/>
+          <path d="M54 51 Q58 53 57 59 Q54 62 51 61 L51 53 Z" fill="#6A8498" stroke="#4A6070" stroke-width="0.5"/>
+          <!-- Visor -->
+          <path d="M29 50 Q29 43 40 42 Q51 43 51 50 L51 58 Q51 62 40 63 Q29 62 29 58 Z" fill="url(#sl-visor)" stroke="rgba(0,200,255,0.9)" stroke-width="1" filter="url(#sl-glow-c)" class="titan-visor"/>
+          <line x1="30" y1="47" x2="50" y2="47" stroke="rgba(0,210,255,0.5)" stroke-width="0.7"/>
+          <line x1="30" y1="50" x2="50" y2="50" stroke="rgba(0,210,255,0.5)" stroke-width="0.7"/>
+          <line x1="30" y1="53" x2="50" y2="53" stroke="rgba(0,210,255,0.5)" stroke-width="0.7"/>
+          <line x1="30" y1="56" x2="50" y2="56" stroke="rgba(0,210,255,0.5)" stroke-width="0.7"/>
+          <line x1="40" y1="42" x2="40" y2="63" stroke="rgba(0,200,255,0.25)" stroke-width="1"/>
+          <!-- Nose guard -->
+          <rect x="38" y="42" width="4" height="21" rx="1.5" fill="#5A7488" opacity="0.5"/>
+          <!-- Crest base -->
+          <rect x="37" y="32" width="6" height="5" rx="1.5" fill="#6A5020" stroke="#d97757" stroke-width="0.8"/>
+          <!-- Crest plume -->
+          <g class="titan-crest">
+            <path d="M40 32 Q35 22 34 14 Q37 18 38 13 Q39 20 39 28 Z" fill="url(#sl-crest)"/>
+            <path d="M40 32 Q40 20 39 12 Q41 17 42 12 Q41 20 40 28 Z" fill="#E74C3C"/>
+            <path d="M40 32 Q45 22 46 14 Q43 18 42 13 Q41 20 41 28 Z" fill="url(#sl-crest)"/>
+          </g>
+          <!-- Crest top gem -->
+          <circle cx="40" cy="34" r="2.2" fill="#d97757" stroke="#8B5010" stroke-width="0.6" filter="url(#sl-glow-g)"/>
+          <!-- Chin strap gold -->
+          <path d="M29 58 Q29 62 32 64 Q36 66 40 66 Q44 66 48 64 Q51 62 51 58" fill="none" stroke="#d97757" stroke-width="1"/>
+          <!-- Chest badge -->
+          <circle cx="40" cy="72" r="3.5" fill="#d97757" stroke="#8B5010" stroke-width="0.8" filter="url(#sl-glow-g)"/>
+          <path d="M40 69.2 L40.8 71.6 L43.2 71.6 L41.2 73.2 L42 75.6 L40 74 L38 75.6 L38.8 73.2 L36.8 71.6 L39.2 71.6 Z" fill="#FFF5CC" stroke="#8B5010" stroke-width="0.3"/>
+          <!-- Bottom deco lines -->
+          <line x1="22" y1="83" x2="40" y2="91" stroke="rgba(217,119,87,0.3)" stroke-width="0.6"/>
+          <line x1="58" y1="83" x2="40" y2="91" stroke="rgba(217,119,87,0.3)" stroke-width="0.6"/>
+        </svg>
+        </div></div>
+      </div>
+      <div class="setup-title">TITAN <span>SUPER AGENT</span></div>
+      <div class="setup-version">v5.0 · DevOps Intelligence Platform</div>
+      <div class="setup-desc">
+        Configure suas API Keys para ativar o agente autônomo de infraestrutura.<br>
+        <strong style="color:var(--copper);">GitHub · Claude AI · Render · Supabase</strong> — tudo integrado.<br><br>
+        <span style="color:var(--green);">🔒 Todas as chaves ficam salvas apenas localmente no seu navegador.</span>
+      </div>
+      <div class="setup-actions">
+        <button class="setup-btn-primary" onclick="openApiModal()">
+          <i class="fas fa-key"></i> CONFIGURAR API KEYS
+        </button>
+        <button class="setup-btn-secondary" onclick="openGithubOAuth()">
+          <i class="fab fa-github"></i> LOGIN COM GITHUB
+        </button>
+      </div>
+      <div class="setup-features">
+        <div class="feat-item"><span class="feat-icon">⚡</span><span>Super Agente IA</span></div>
+        <div class="feat-item"><span class="feat-icon">◈</span><span>GitHub Editor</span></div>
+        <div class="feat-item"><span class="feat-icon">🌐</span><span>Background 3D</span></div>
+        <div class="feat-item"><span class="feat-icon">🎨</span><span>10 Skills</span></div>
+        <div class="feat-item"><span class="feat-icon">🚀</span><span>Render Deploy</span></div>
+        <div class="feat-item"><span class="feat-icon">📱</span><span>Mobile First</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ API KEYS MODAL ══════════════════════════════════════════ -->
+  <div id="api-modal-overlay" onclick="if(event.target===this)closeApiModal()">
+    <div id="api-modal">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <div>
+          <div class="modal-title"><i class="fas fa-sliders-h" style="color:var(--copper);margin-right:8px;"></i>API KEYS</div>
+          <div class="modal-subtitle">CONECTE OS SERVIÇOS · SALVO APENAS LOCALMENTE</div>
+        </div>
+        <button class="modal-close" onclick="closeApiModal()"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="modal-tabs-nav">
+        <button class="modal-tab active" data-section="claude" onclick="switchModalTab('claude')">✦ Claude</button>
+        <button class="modal-tab" data-section="github" onclick="switchModalTab('github')">◈ GitHub</button>
+        <button class="modal-tab" data-section="render" onclick="switchModalTab('render')">◉ Render</button>
+        <button class="modal-tab" data-section="supabase" onclick="switchModalTab('supabase')">◆ Supabase</button>
+      </div>
+
+      <!-- CLAUDE -->
+      <div class="modal-section active" id="modal-section-claude">
+        <div class="api-section-title">✦ CLAUDE AI — ANTHROPIC <span id="status-anthropic" class="api-status-indicator none"></span></div>
+        <div class="api-field">
+          <div class="api-label">
+            <span class="api-label-name">ANTHROPIC_API_KEY</span>
+            <span id="text-status-anthropic" style="font-size:9px;color:var(--text-dim);">não configurada</span>
+          </div>
+          <div class="api-input-wrap">
+            <input id="key-anthropic" class="api-input" type="password" placeholder="sk-ant-api03-..." autocomplete="off" oninput="onKeyInput('anthropic')"/>
+            <button class="api-toggle-btn" onclick="toggleVisibility('key-anthropic',this)"><i class="fas fa-eye"></i></button>
+            <button class="api-test-btn" id="test-anthropic" onclick="testAnthropicKey()">TESTAR</button>
+          </div>
+          <div class="api-hint">Obtenha em <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> — Obrigatório.</div>
+        </div>
+        <div class="api-field">
+          <div class="api-label"><span class="api-label-name">MODELO</span></div>
+          <select id="key-model" class="api-input">
+            <option value="claude-sonnet-4-6">claude-sonnet-4-6 (recomendado)</option>
+            <option value="claude-opus-4-6">claude-opus-4-6 (mais potente)</option>
+            <option value="claude-haiku-4-5-20251001">claude-haiku-4-5-20251001 (mais rápido e barato)</option>
+            <option value="claude-sonnet-4-5">claude-sonnet-4-5 (legado)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- GITHUB -->
+      <div class="modal-section" id="modal-section-github">
+        <div class="api-section-title">◈ GITHUB <span id="status-github" class="api-status-indicator none"></span></div>
+        <div class="api-field">
+          <button class="github-oauth-btn" onclick="openGithubOAuth()">
+            <i class="fab fa-github"></i> Conectar com GitHub OAuth
+          </button>
+          <div id="github-user-info" style="display:none;">
+            <img id="github-user-avatar" src="" alt="avatar"/>
+            <div>
+              <div id="github-user-name" style="font-size:11px;font-weight:700;color:var(--text);"></div>
+              <div style="font-size:9px;color:var(--green);">✓ Conectado</div>
+            </div>
+          </div>
+          <div class="api-hint" style="margin-top:8px;">— ou insira um Personal Access Token manualmente —</div>
+        </div>
+        <div class="api-field">
+          <div class="api-label">
+            <span class="api-label-name">GITHUB_TOKEN</span>
+            <span id="text-status-github" style="font-size:9px;color:var(--text-dim);">não configurado</span>
+          </div>
+          <div class="api-input-wrap">
+            <input id="key-github" class="api-input" type="password" placeholder="ghp_..." autocomplete="off" oninput="onKeyInput('github')"/>
+            <button class="api-toggle-btn" onclick="toggleVisibility('key-github',this)"><i class="fas fa-eye"></i></button>
+            <button class="api-test-btn" id="test-github" onclick="testGithubKey()">TESTAR</button>
+          </div>
+          <div class="api-hint">Crie em <a href="https://github.com/settings/tokens/new?scopes=repo,read:user&description=TITAN+v5" target="_blank">GitHub → Settings → Tokens</a> — scopes: <code>repo</code>, <code>read:user</code></div>
+        </div>
+        <div class="api-field">
+          <div class="api-label"><span class="api-label-name">REPOSITÓRIO PADRÃO</span></div>
+          <input id="key-github-repo" class="api-input" type="text" placeholder="usuario/repositorio" style="width:100%;"/>
+          <div class="api-hint">Ex: <code style="color:var(--accent)">octocat/hello-world</code></div>
+        </div>
+        <div class="api-field">
+          <div class="api-label"><span class="api-label-name">BRANCH PADRÃO</span></div>
+          <input id="key-github-branch" class="api-input" type="text" placeholder="main" style="width:100%;"/>
+        </div>
+        <div id="oauth-manual-fallback"></div>
+      </div>
+
+      <!-- RENDER -->
+      <div class="modal-section" id="modal-section-render">
+        <div class="api-section-title">◉ RENDER.COM <span id="status-render" class="api-status-indicator none"></span></div>
+        <div class="api-field">
+          <div class="api-label">
+            <span class="api-label-name">RENDER_API_KEY</span>
+            <span id="text-status-render" style="font-size:9px;color:var(--text-dim);">não configurado</span>
+          </div>
+          <div class="api-input-wrap">
+            <input id="key-render" class="api-input" type="password" placeholder="rnd_..." autocomplete="off" oninput="onKeyInput('render')"/>
+            <button class="api-toggle-btn" onclick="toggleVisibility('key-render',this)"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="api-hint">Obtenha em <a href="https://dashboard.render.com/u/settings#api-keys" target="_blank">dashboard.render.com</a></div>
+        </div>
+        <div class="api-field">
+          <div class="api-label"><span class="api-label-name">RENDER_SERVICE_ID</span></div>
+          <input id="key-render-service" class="api-input" type="text" placeholder="srv-..." style="width:100%;"/>
+          <div class="api-hint">Dashboard → Service → Settings → Service ID</div>
+        </div>
+      </div>
+
+      <!-- SUPABASE -->
+      <div class="modal-section" id="modal-section-supabase">
+        <div class="api-section-title">◆ SUPABASE <span id="status-supabase" class="api-status-indicator none"></span></div>
+        <div class="api-field">
+          <div class="api-label"><span class="api-label-name">SUPABASE_URL</span></div>
+          <input id="key-supabase-url" class="api-input" type="text" placeholder="https://xxx.supabase.co" style="width:100%;"/>
+        </div>
+        <div class="api-field">
+          <div class="api-label">
+            <span class="api-label-name">SUPABASE_SERVICE_KEY</span>
+            <span id="text-status-supabase" style="font-size:9px;color:var(--text-dim);">não configurada</span>
+          </div>
+          <div class="api-input-wrap">
+            <input id="key-supabase" class="api-input" type="password" placeholder="eyJ..." autocomplete="off" oninput="onKeyInput('supabase')"/>
+            <button class="api-toggle-btn" onclick="toggleVisibility('key-supabase',this)"><i class="fas fa-eye"></i></button>
+            <button class="api-test-btn" id="test-supabase" onclick="testSupabaseKey()">TESTAR</button>
+          </div>
+          <div class="api-hint">Project → Settings → API → service_role key</div>
+        </div>
+      </div>
+
+      <div class="api-saved-banner" id="api-saved-banner"><i class="fas fa-check-circle"></i> API Keys salvas com sucesso!</div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="clearAllKeys()"><i class="fas fa-trash"></i> LIMPAR</button>
+        <button class="btn-primary" onclick="saveApiKeys()"><i class="fas fa-save"></i> SALVAR →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CRITICAL ALERT ═════════════════════════════════════════ -->
+  <div id="critical-alert">
+    <div class="alert-title"><i class="fas fa-exclamation-triangle"></i> ERRO CRÍTICO DETECTADO</div>
+    <div class="alert-msg" id="alert-msg"></div>
+    <div class="alert-btns">
+      <button class="alert-analyze" onclick="analyzeFromAlert()"><i class="fas fa-robot"></i> Analisar com Agente</button>
+      <button class="alert-dismiss" onclick="dismissAlert()">Fechar</button>
+    </div>
+  </div>
+
+  <!-- ══ SEARCH MODAL ════════════════════════════════════════════ -->
+  <div id="search-modal" onclick="if(event.target===this)closeGlobalSearch()">
+    <div id="search-modal-box">
+      <input id="search-input" type="text" placeholder="Buscar arquivos, tabs, skills..." autocomplete="off" onkeydown="if(event.key==='Escape')closeGlobalSearch()"/>
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════ -->
+  <header id="header">
+    <div id="header-logo">
+      <div class="logo-hex">
+        <div class="titan-icon-wrap">
+        <div class="titan-icon-3d-sm">
+        <svg viewBox="0 0 40 50" width="32" height="40" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 2px 6px rgba(217,119,87,0.45))">
+          <defs>
+            <linearGradient id="hl-rim" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F5D060"/><stop offset="45%" stop-color="#d97757"/><stop offset="100%" stop-color="#8B5010"/></linearGradient>
+            <linearGradient id="hl-body" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a2e58"/><stop offset="100%" stop-color="#060c18"/></linearGradient>
+            <linearGradient id="hl-helm" x1="0%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#C8DCF0"/><stop offset="60%" stop-color="#6A8498"/><stop offset="100%" stop-color="#3A5060"/></linearGradient>
+            <linearGradient id="hl-crest" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#E74C3C"/><stop offset="100%" stop-color="#7B241C"/></linearGradient>
+            <linearGradient id="hl-visor" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="rgba(0,200,255,0.9)"/><stop offset="100%" stop-color="rgba(0,80,180,0.5)"/></linearGradient>
+            <filter id="hl-gc"><feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="b"/><feFlood flood-color="#00D4FF" flood-opacity="0.6" result="c"/><feComposite in="c" in2="b" operator="in" result="s"/><feComposite in="SourceGraphic" in2="s" operator="over"/></filter>
+            <filter id="hl-gg"><feGaussianBlur in="SourceAlpha" stdDeviation="1" result="b"/><feFlood flood-color="#d97757" flood-opacity="0.5" result="c"/><feComposite in="c" in2="b" operator="in" result="s"/><feComposite in="SourceGraphic" in2="s" operator="over"/></filter>
+          </defs>
+          <!-- Shield rim -->
+          <path d="M20 2 L37 8 L37 26 Q37 41 20 48 Q3 41 3 26 L3 8 Z" fill="url(#hl-rim)"/>
+          <!-- Shield body -->
+          <path d="M20 4 L35 10 L35 26 Q35 39 20 46 Q5 39 5 26 L5 10 Z" fill="url(#hl-body)"/>
+          <!-- Inner border -->
+          <path d="M20 6 L33 11 L33 26 Q33 37 20 44 Q7 37 7 26 L7 11 Z" fill="none" stroke="rgba(217,119,87,0.35)" stroke-width="0.6"/>
+          <!-- Crest plume -->
+          <g class="titan-crest">
+            <path d="M20 15 Q16.5 9 16 5 Q18 7.5 18.5 5 Q19 9 19.5 13 Z" fill="url(#hl-crest)"/>
+            <path d="M20 15 Q20 8 19.5 5 Q20.5 7.5 21 5 Q20.5 8 20 13 Z" fill="#E74C3C"/>
+            <path d="M20 15 Q23.5 9 24 5 Q22 7.5 21.5 5 Q21 9 20.5 13 Z" fill="url(#hl-crest)"/>
+          </g>
+          <!-- Crest base -->
+          <rect x="18" y="14" width="4" height="3" rx="1" fill="#6A5020" stroke="#d97757" stroke-width="0.5"/>
+          <!-- Top gem -->
+          <circle cx="20" cy="15.5" r="1.3" fill="#d97757" filter="url(#hl-gg)"/>
+          <!-- Helmet dome -->
+          <path d="M11 27 Q11 19 20 18 Q29 19 29 27 L27.5 30 Q23 32 20 32 Q17 32 12.5 30 Z" fill="url(#hl-helm)" stroke="#4A6070" stroke-width="0.5"/>
+          <!-- Cheeks -->
+          <path d="M12.5 25 Q10 26.5 10.5 30 Q12.5 32 14 31 L14 26 Z" fill="#6A8498" stroke="#3A5060" stroke-width="0.4"/>
+          <path d="M27.5 25 Q30 26.5 29.5 30 Q27.5 32 26 31 L26 26 Z" fill="#6A8498" stroke="#3A5060" stroke-width="0.4"/>
+          <!-- Visor -->
+          <path d="M14 25 Q14 20 20 19.5 Q26 20 26 25 L26 29 Q26 31.5 20 32 Q14 31.5 14 29 Z" fill="url(#hl-visor)" stroke="rgba(0,200,255,0.9)" stroke-width="0.7" filter="url(#hl-gc)" class="titan-visor"/>
+          <line x1="14.5" y1="23" x2="25.5" y2="23" stroke="rgba(0,210,255,0.5)" stroke-width="0.5"/>
+          <line x1="14.2" y1="25.5" x2="25.8" y2="25.5" stroke="rgba(0,210,255,0.5)" stroke-width="0.5"/>
+          <line x1="14.2" y1="28" x2="25.8" y2="28" stroke="rgba(0,210,255,0.5)" stroke-width="0.5"/>
+          <line x1="20" y1="19.5" x2="20" y2="32" stroke="rgba(0,200,255,0.22)" stroke-width="0.7"/>
+          <!-- Nose guard -->
+          <rect x="19" y="19.5" width="2" height="12.5" rx="0.8" fill="#4A6478" opacity="0.5"/>
+          <!-- Chin strap -->
+          <path d="M14 29 Q14 31.5 16 32.5 Q18 33.5 20 33.5 Q22 33.5 24 32.5 Q26 31.5 26 29" fill="none" stroke="#d97757" stroke-width="0.7"/>
+          <!-- Neck + body -->
+          <rect x="18.5" y="32" width="3" height="4" rx="1.2" fill="#9AAABB"/>
+          <rect x="14" y="35" width="12" height="8" rx="2" fill="url(#hl-helm)" opacity="0.9"/>
+          <line x1="20" y1="35" x2="20" y2="40" stroke="#3A5060" stroke-width="0.5"/>
+          <!-- Shoulders -->
+          <ellipse cx="12" cy="37" rx="3" ry="2" fill="#9AAABB" stroke="#6A8498" stroke-width="0.4"/>
+          <ellipse cx="28" cy="37" rx="3" ry="2" fill="#8A9AAB" stroke="#6A8498" stroke-width="0.4"/>
+          <!-- Chest badge -->
+          <circle cx="20" cy="39.5" r="2" fill="#d97757" filter="url(#hl-gg)"/>
+          <path d="M20 38 L20.5 39.3 L21.9 39.3 L20.8 40.2 L21.3 41.5 L20 40.6 L18.7 41.5 L19.2 40.2 L18.1 39.3 L19.5 39.3 Z" fill="#FFFADD" stroke="#8B5010" stroke-width="0.2"/>
+        </svg>
+        </div></div>
+      </div>
+      <div class="logo-text">
+        <div class="logo-title">TITAN <span id="logo-version">v5</span></div>
+        <div class="logo-sub">SUPER DEVOPS AGENT</div>
+      </div>
+    </div>
+
+    <div id="conn-status"></div>
+
+    <div id="header-right">
+      <span id="agent-status-badge"></span>
+      <button class="icon-btn" onclick="openGlobalSearch()" title="Buscar (Ctrl+K)">
+        <i class="fas fa-search"></i>
+      </button>
+      <button id="menu-toggle" class="icon-btn" onclick="toggleSidebar()" title="Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <button id="config-btn" onclick="openApiModal()" title="API Keys">
+        <i class="fas fa-key"></i> <span id="config-btn-text">KEYS</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══ CONTENT ════════════════════════════════════════════════ -->
+  <div id="content">
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div id="sidebar-header">
+        <span class="sidebar-section-label">NAVEGAÇÃO</span>
+        <button class="icon-btn sidebar-close-btn" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="tabs"></div>
+      <div id="sidebar-footer">
+        <div class="sidebar-section-label" style="margin-bottom:8px;">SKILLS</div>
+        <div id="skills-nav"></div>
+      </div>
+    </nav>
+
+    <!-- SIDEBAR OVERLAY -->
+    <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- PANELS -->
+    <main id="panels">
+
+      <!-- ══ DASHBOARD ════════════════════════════════════════ -->
+      <div id="panel-dashboard" class="panel active">
+        <div class="panel-header">
+          <div class="panel-title"><span class="p-icon">⬡</span> DASHBOARD</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-sm" onclick="refreshAllStatus()"><i class="fas fa-sync-alt"></i> REFRESH</button>
+            <button class="btn-sm btn-accent" onclick="switchTab('agent')"><i class="fas fa-robot"></i> AGENTE</button>
+          </div>
+        </div>
+        <div class="grid-metrics" id="dash-metrics"></div>
+        <div class="row-2col">
+          <div class="card">
+            <div class="card-title"><i class="fas fa-chart-bar"></i> SYSTEM METRICS</div>
+            <div id="dash-bars"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="fas fa-bolt"></i> WORKFLOWS CI/CD</div>
+            <div id="workflows-list"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-list"></i> LOG RECENTE <button class="btn-sm ml-auto" onclick="switchTab('logs')" style="margin-left:auto;">VER TUDO</button></div>
+          <div id="dash-log-preview"></div>
+        </div>
+      </div>
+
+      <!-- ══ GITHUB ═══════════════════════════════════════════ -->
+      <div id="panel-github" class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fab fa-github"></i> GITHUB</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-sm" onclick="fetchGitHubStatus()"><i class="fas fa-sync-alt"></i> REFRESH</button>
+            <a href="#" onclick="if(STATE.ghStatus.url&&STATE.ghStatus.url!=='—')window.open(STATE.ghStatus.url,'_blank')" class="btn-sm btn-accent"><i class="fas fa-external-link-alt"></i> VER REPO</a>
+            <button class="btn-sm btn-accent" onclick="switchTab('editor')"><i class="fas fa-code"></i> EDITOR</button>
+          </div>
+        </div>
+        <div class="grid-metrics" id="github-metrics"></div>
+        <div class="row-2col">
+          <div class="card">
+            <div class="card-title"><i class="fas fa-code-branch"></i> PULL REQUESTS</div>
+            <div id="pr-list"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="fas fa-bug"></i> ISSUES</div>
+            <div id="issues-list"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-history"></i> COMMITS RECENTES</div>
+          <div id="commits-list"></div>
+        </div>
+      </div>
+
+      <!-- ══ RENDER ════════════════════════════════════════════ -->
+      <div id="panel-render" class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fas fa-server"></i> RENDER.COM</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-sm" onclick="fetchRenderStatus()"><i class="fas fa-sync-alt"></i> REFRESH</button>
+            <button class="btn-sm btn-accent" onclick="openApiModal();switchModalTab('render')"><i class="fas fa-plus"></i> CONFIGURAR</button>
+          </div>
+        </div>
+        <div class="grid-metrics" id="render-metrics"></div>
+        <div class="row-2col">
+          <div class="card">
+            <div class="card-title"><i class="fas fa-chart-line"></i> MÉTRICAS</div>
+            <div id="render-bars"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="fas fa-rocket"></i> AÇÕES</div>
+            <div id="deploys-list">
+              <div class="empty-state"><span class="empty-text">Use o Agente para gerenciar deploys</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SUPABASE ══════════════════════════════════════════ -->
+      <div id="panel-supabase" class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fas fa-database"></i> SUPABASE</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-sm" onclick="fetchSupabaseStatus()"><i class="fas fa-sync-alt"></i> REFRESH</button>
+            <button class="btn-sm btn-accent" onclick="openApiModal();switchModalTab('supabase')"><i class="fas fa-plug"></i> CONFIGURAR</button>
+          </div>
+        </div>
+        <div class="grid-metrics" id="sb-metrics"></div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-table"></i> TABELAS</div>
+          <div id="tables-list">
+            <div class="empty-state"><span class="empty-text">Configure Supabase para ver tabelas</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ AGENT ═════════════════════════════════════════════ -->
+      <div id="panel-agent" class="panel" style="padding:0;">
+        <div id="agent-section">
+          <div id="agent-toolbar">
+            <div class="agent-title">
+              <div class="agent-dot"></div>
+              <span>TITAN AGENT</span>
+              <span id="agent-model-badge" class="agent-model-tag"></span>
+            </div>
+            <div id="quick-prompts">
+              <button class="quick-btn" onclick="setAgentPrompt('Liste os arquivos do repositório')"><i class="fas fa-folder"></i> Arquivos</button>
+              <button class="quick-btn" onclick="setAgentPrompt('Qual é o status completo do CI/CD e workflows?')"><i class="fas fa-bolt"></i> CI Status</button>
+              <button class="quick-btn" onclick="setAgentPrompt('Liste os PRs abertos com detalhes')"><i class="fas fa-code-branch"></i> PRs</button>
+              <button class="quick-btn" onclick="setAgentPrompt('Liste as issues abertas e sugira priorizações')"><i class="fas fa-bug"></i> Issues</button>
+              <button class="quick-btn" onclick="setAgentPrompt('Verifique os logs de erro do Render e sugira correções')"><i class="fas fa-server"></i> Render</button>
+              <button class="quick-btn" onclick="setAgentPrompt('Liste as tabelas do Supabase e descreva o schema')"><i class="fas fa-database"></i> Supabase</button>
+              <button class="quick-btn" onclick="setAgentPrompt('Analise o repositório completo e sugira melhorias de código e arquitetura')"><i class="fas fa-magic"></i> Analisar</button>
+              <button class="quick-btn" onclick="setAgentPrompt('Crie um relatório completo de status do projeto em markdown')"><i class="fas fa-file-alt"></i> Relatório</button>
+            </div>
+            <button class="btn-sm" onclick="clearAgentHistory()" style="flex-shrink:0;"><i class="fas fa-trash"></i></button>
+          </div>
+          <div id="chat-window">
+            <div id="chat-messages"></div>
+            <div id="agent-thinking">
+              <div class="thinking-ring"></div>
+              <div class="thinking-dots"><span></span><span></span><span></span></div>
+              <span>Agente processando...</span>
+            </div>
+            <div id="chat-input-row">
+              <div class="input-wrap">
+                <textarea id="agent-input"
+                  placeholder="Descreva o que deseja fazer... (Enter envia, Shift+Enter = nova linha)"
+                  rows="1"
+                  oninput="agentInputResize(this)"
+                  onkeydown="agentInputKeydown(event)"></textarea>
+                <div class="input-actions">
+                  <button class="input-attach-btn" onclick="attachFile()" title="Anexar arquivo"><i class="fas fa-paperclip"></i></button>
+                </div>
+              </div>
+              <button id="agent-send" onclick="sendAgent()" title="Enviar (Enter)">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ EDITOR ════════════════════════════════════════════ -->
+      <div id="panel-editor" class="panel editor-panel">
+        <div id="editor-container">
+
+          <!-- Editor Topbar -->
+          <div id="editor-topbar">
+            <div class="editor-tb-left">
+              <div class="editor-logo"><i class="fas fa-code"></i> CODE EDITOR</div>
+              <div id="editor-repo-info"></div>
+            </div>
+            <div class="editor-tb-right">
+              <button class="btn-sm" onclick="fetchGitHubFileTree('')" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+              <button class="btn-sm" onclick="toggleFindReplace()" title="Buscar/Substituir (Ctrl+H)"><i class="fas fa-search"></i></button>
+              <button class="btn-sm" onclick="openRepoSwitcher()" title="Trocar repositório"><i class="fas fa-exchange-alt"></i> REPO</button>
+              <button class="btn-sm btn-accent" id="editor-preview-btn" onclick="previewProject()" title="Preview do projeto"><i class="fas fa-external-link-alt"></i> PREVIEW</button>
+            </div>
+          </div>
+
+          <!-- Find/Replace Bar -->
+          <div id="find-replace-bar" style="display:none;">
+            <span style="font-size:9px;color:var(--text-dim);white-space:nowrap;">BUSCAR:</span>
+            <input id="find-input" type="text" placeholder="Texto..." onkeydown="if(event.key==='Enter')findInEditor()"/>
+            <span style="font-size:9px;color:var(--text-dim);white-space:nowrap;">SUBSTITUIR:</span>
+            <input id="replace-input" type="text" placeholder="Por..."/>
+            <button class="btn-sm" onclick="findInEditor()"><i class="fas fa-arrow-right"></i></button>
+            <button class="btn-sm" onclick="replaceInEditor()">1x</button>
+            <button class="btn-sm" onclick="replaceAllInEditor()">Tudo</button>
+            <button class="btn-sm" onclick="toggleFindReplace()"><i class="fas fa-times"></i></button>
+          </div>
+
+          <!-- GitHub Auth Banner (shown when no token) -->
+          <div id="github-auth-banner" style="display:none;">
+            <div class="github-auth-card">
+              <i class="fab fa-github" style="font-size:36px;color:var(--text-mid);margin-bottom:12px;display:block;"></i>
+              <div style="font-family:var(--font-ui);font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;">Conecte seu GitHub</div>
+              <div style="font-size:11px;color:var(--text-mid);margin-bottom:16px;line-height:1.7;">
+                Configure seu token em <strong style="color:var(--accent);">⚙ API KEYS</strong> ou use o login OAuth
+                para acessar seus repositórios, navegar arquivos e editar código diretamente.
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+                <button class="github-oauth-btn" onclick="openGithubOAuth()" style="flex:none;padding:10px 16px;font-size:12px;"><i class="fab fa-github"></i> Login com GitHub OAuth</button>
+                <button class="btn-secondary" onclick="openApiModal()" style="height:42px;padding:0 16px;"><i class="fas fa-key"></i> Inserir Token Manual</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Repo Switcher Panel -->
+          <div id="repo-switcher">
+            <div class="repo-switcher-card">
+              <div class="card-title" style="margin-bottom:10px;"><i class="fab fa-github"></i> TROCAR REPOSITÓRIO</div>
+              <div class="api-field">
+                <input id="repo-switch-input" class="api-input" type="text" placeholder="usuario/repositorio" style="width:100%;" onkeydown="if(event.key==='Enter')switchRepo()"/>
+              </div>
+              <div id="user-repos-list"></div>
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <button class="btn-secondary" onclick="closeRepoSwitcher()">CANCELAR</button>
+                <button class="btn-primary" onclick="switchRepo()"><i class="fas fa-check"></i> TROCAR</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editor Layout -->
+          <div id="editor-layout">
+
+            <!-- File Explorer -->
+            <div id="file-explorer">
+              <div id="file-explorer-header">
+                <span><i class="fas fa-folder-open"></i> EXPLORER</span>
+                <div style="display:flex;gap:4px;">
+                  <button class="icon-btn" onclick="fetchGitHubFileTree(STATE._fileTreePath||'')" title="Refresh" style="width:22px;height:22px;font-size:10px;"><i class="fas fa-sync-alt"></i></button>
+                  <button class="icon-btn" onclick="addNewFile()" title="Novo arquivo" style="width:22px;height:22px;font-size:10px;"><i class="fas fa-plus"></i></button>
+                  <button class="icon-btn" onclick="addNewFolder()" title="Nova pasta" style="width:22px;height:22px;font-size:10px;"><i class="fas fa-folder-plus"></i></button>
+                </div>
+              </div>
+              <div id="explorer-breadcrumb"></div>
+              <div id="file-list"></div>
+              <div id="file-explorer-footer">
+                <div id="git-branch-display"><i class="fas fa-code-branch"></i> <span id="current-branch-name">main</span></div>
+                <button class="btn-sm" onclick="switchBranch()" style="height:22px;font-size:8px;padding:0 6px;"><i class="fas fa-exchange-alt"></i></button>
+              </div>
+            </div>
+
+            <!-- Editor Main -->
+            <div id="editor-main">
+              <div id="editor-tabs-bar" class="editor-tabs-list"></div>
+              <div id="editor-toolbar">
+                <span id="editor-filename">Nenhum arquivo</span>
+                <span id="editor-modified-badge"></span>
+                <div style="display:flex;gap:4px;margin-left:auto;">
+                  <button id="editor-ai-btn" onclick="toggleAiBar()" title="AI Edit (IA)"><i class="fas fa-magic"></i></button>
+                  <button id="editor-format-btn" onclick="formatCode()" title="Formatar código"><i class="fas fa-align-left"></i></button>
+                  <button id="editor-commit-btn" onclick="commitCurrentFile()"><i class="fas fa-upload"></i> COMMIT</button>
+                </div>
+              </div>
+              <div id="editor-content-area">
+                <div id="line-numbers">1</div>
+                <textarea id="code-editor" spellcheck="false"
+                  oninput="onEditorInput()"
+                  onkeydown="handleEditorKeydown(event)"
+                  onscroll="syncScroll()"
+                  placeholder="← Selecione um arquivo no Explorer&#10;ou configure GitHub em ⚙ API KEYS&#10;&#10;Atalhos:&#10;Ctrl+S → Salvar&#10;Ctrl+Enter → Commit&#10;Ctrl+/ → Toggle Comment&#10;Ctrl+H → Buscar/Substituir&#10;Tab → Indentar"></textarea>
+              </div>
+              <div id="ai-edit-bar" style="display:none;">
+                <input id="ai-edit-instruction" placeholder="Descreva a alteração com IA... (ex: adicione tratamento de erros)" autocomplete="off" onkeydown="if(event.key==='Enter')applyAiEdit()"/>
+                <button class="ai-edit-btn" onclick="applyAiEdit()"><i class="fas fa-magic"></i> APLICAR</button>
+                <button class="ai-edit-close" onclick="toggleAiBar()"><i class="fas fa-times"></i></button>
+              </div>
+              <div id="editor-footer">
+                <span class="stat"><i class="fas fa-code-branch"></i> <span id="footer-branch">main</span></span>
+                <span class="stat"><span id="editor-stat-lines">0</span> linhas</span>
+                <span class="stat"><span id="editor-stat-chars">0</span> chars</span>
+                <span class="stat"><span id="editor-stat-words">0</span> palavras</span>
+                <span class="stat" id="editor-lang-badge"></span>
+                <span id="editor-status"></span>
+                <button class="editor-save-btn" onclick="saveCurrentFile()"><i class="fas fa-save"></i> SALVAR</button>
+              </div>
+            </div>
+
+            <!-- Right Panel: Git & Preview -->
+            <div id="editor-right-panel">
+              <div class="right-panel-tabs">
+                <button class="rp-tab active" onclick="switchRightPanel('git',this)"><i class="fas fa-code-branch"></i> GIT</button>
+                <button class="rp-tab" onclick="switchRightPanel('preview',this)"><i class="fas fa-eye"></i> PREVIEW</button>
+              </div>
+              <div id="rp-git" class="rp-content active">
+                <div class="card-title" style="margin-bottom:8px;"><i class="fas fa-history"></i> COMMITS</div>
+                <div id="editor-commits-list"></div>
+              </div>
+              <div id="rp-preview" class="rp-content">
+                <div class="card-title" style="margin-bottom:8px;"><i class="fas fa-external-link-alt"></i> PREVIEW</div>
+                <div id="preview-url-bar">
+                  <input id="preview-url-input" type="text" placeholder="https://meu-projeto.pages.dev" class="api-input"/>
+                  <button class="btn-sm btn-accent" onclick="openPreviewUrl()"><i class="fas fa-external-link-alt"></i></button>
+                </div>
+                <button class="btn-sm" onclick="openProjectInBrowser()" style="width:100%;margin-bottom:8px;justify-content:center;"><i class="fas fa-globe"></i> Abrir em Nova Aba</button>
+                <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin allow-forms" title="Preview"></iframe>
+              </div>
+            </div>
+
+          </div><!-- /editor-layout -->
+        </div>
+      </div>
+
+      <!-- ══ LOGS ═══════════════════════════════════════════════ -->
+      <div id="panel-logs" class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fas fa-terminal"></i> LOGS DO SISTEMA</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span id="log-count-badge2" class="badge-count"></span>
+            <button class="btn-sm" onclick="exportLogs()"><i class="fas fa-download"></i> EXPORTAR</button>
+            <button class="btn-sm" onclick="clearLogs()"><i class="fas fa-trash"></i> LIMPAR</button>
+          </div>
+        </div>
+        <div class="card" style="padding:10px;">
+          <div class="log-filters">
+            <button class="log-filter-btn active" onclick="filterLogs('all',this)">TODOS</button>
+            <button class="log-filter-btn" onclick="filterLogs('info',this)">INFO</button>
+            <button class="log-filter-btn" onclick="filterLogs('success',this)">SUCCESS</button>
+            <button class="log-filter-btn" onclick="filterLogs('warn',this)">WARN</button>
+            <button class="log-filter-btn" onclick="filterLogs('error',this)">ERROR</button>
+            <button class="log-filter-btn" onclick="filterLogs('agent',this)">AGENT</button>
+          </div>
+          <div id="log-scroll" class="log-scroll-area"></div>
+        </div>
+      </div>
+
+      <!-- ══ ERRORS ══════════════════════════════════════════════ -->
+      <div id="panel-errors" class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fas fa-exclamation-triangle"></i> <span id="errors-title">ERROS</span></div>
+          <button class="btn-sm btn-danger" onclick="clearErrors()"><i class="fas fa-trash"></i> LIMPAR</button>
+        </div>
+        <div id="errors-list"></div>
+      </div>
+
+      <!-- ══ APPROVALS ════════════════════════════════════════════ -->
+      <div id="panel-approvals" class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fas fa-shield-alt"></i> AÇÕES PENDENTES</div>
+          <span id="pending-count" class="badge-count yellow"></span>
+        </div>
+        <div id="approvals-list"></div>
+      </div>
+
+      <!-- ══ SKILLS ═══════════════════════════════════════════════ -->
+      <div id="panel-skills" class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="fas fa-puzzle-piece"></i> SKILLS</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input id="skills-search" class="api-input" type="text" placeholder="Buscar skill..." style="width:160px;font-size:11px;" oninput="filterSkills(this.value)"/>
+            <button class="btn-sm" onclick="closeSkill()" id="skills-back-btn" style="display:none;"><i class="fas fa-arrow-left"></i> Voltar</button>
+          </div>
+        </div>
+        <div id="skills-grid"></div>
+        <div id="skill-runner" style="display:none;">
+          <div id="skill-runner-content"></div>
+        </div>
+      </div>
+
+    </main><!-- /panels -->
+
+    <!-- BOTTOM TAB BAR (mobile) -->
+    <div id="bottom-tabs">
+      <div id="bottom-tabs-inner"></div>
+    </div>
+
+  </div><!-- /content -->
+
+</div><!-- /app -->
+
+<!-- ══ SCRIPTS (ordem importa) ══════════════════════════════════ -->
+<script src="js/core.js"></script>
+<script src="js/apikeys.js"></script>
+<script src="js/three-bg.js"></script>
+<script src="js/agent.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/tabs.js"></script>
+<script src="js/skills.js"></script>
+
+<script>
+/* ── TITAN v5 INIT ──────────────────────────────────────────────── */
+(function init(){
+  // Init Three.js background
+  try { if(window.initThreeBackground) initThreeBackground(); }
+  catch(e){ console.warn("Three.js init error:", e); }
+
+  // Load persistent data
+  loadKeys();
+  loadBookmarks?.();
+  loadSnippets?.();
+
+  // Build UI
+  buildTabs();
+  buildSkillsNav();
+  buildSkillsGrid();
+  updateConnStatus();
+  updateBadges();
+
+  // Switch to initial tab
+  switchTab("dashboard");
+
+  // Render initial agent message
+  const msgs = document.getElementById("chat-messages");
+  if(msgs && STATE.agentMsgs.length) {
+    STATE.agentMsgs.forEach(msg => renderAgentMsg(msg));
+  }
+
+  // If already configured, skip setup screen
+  if(isConfigured()){
+    const ss = document.getElementById("setup-screen");
+    if(ss) ss.classList.remove("show");
+    const cb = document.getElementById("config-btn");
+    if(cb) cb.classList.add("configured");
+    const ct = document.getElementById("config-btn-text");
+    if(ct) ct.textContent = "✓ KEYS";
+    addLog("success","INIT","TITAN v5 online — API Keys carregadas");
+    startRealDataPolling();
+  } else {
+    addLog("info","INIT","TITAN v5 iniciado — configure suas API Keys");
+  }
+
+  // Update agent model badge
+  updateAgentModelBadge();
+
+  // Mobile touch: swipe down to close modal
+  let touchStartY = 0;
+  const modal = document.getElementById("api-modal");
+  if(modal){
+    modal.addEventListener("touchstart", e => touchStartY = e.touches[0].clientY, {passive:true});
+    modal.addEventListener("touchmove", e => {
+      if(e.touches[0].clientY - touchStartY > 80) closeApiModal();
+    }, {passive:true});
+  }
+
+  // Keyboard shortcuts
+  document.addEventListener("keydown", e => {
+    if(e.ctrlKey && e.key === "k"){ e.preventDefault(); openGlobalSearch(); }
+    if(e.key === "Escape"){ closeApiModal(); closeGlobalSearch(); closeRepoSwitcher(); }
+  });
+
+  // Window resize
+  window.addEventListener("resize", ()=>{
+    const isMobile = window.innerWidth < 768;
+    if(!isMobile){ closeSidebar(); }
+  });
+
+  addLog("info","INIT","TITAN v5 pronto ⚡ Versão "+VERSION);
+})();
+</script>
+</body>
+</html>
