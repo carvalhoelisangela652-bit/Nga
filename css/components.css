@@ -402,3 +402,338 @@ select.api-input { cursor: pointer; }
   outline: none;
 }
 #find-input:focus, #replace-input:focus { border-color: var(--accent); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE-FIRST RESPONSIVE FOR COMPONENTS
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── MODAL MOBILE OPTIMIZATION ────────────────────────────────────– */
+@media (max-width: 767px) {
+  #api-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - 100px);
+    border-radius: 16px 16px 0 0;
+  }
+
+  .modal-header {
+    padding: 12px 14px 10px;
+    gap: 10px;
+  }
+
+  .modal-title {
+    font-size: 12px;
+  }
+
+  .modal-tabs-nav {
+    gap: 3px;
+    padding: 8px 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-tab {
+    padding: 5px 8px;
+    font-size: 8px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+  }
+
+  .modal-section {
+    padding: 10px 12px;
+  }
+
+  .api-field {
+    margin-bottom: 10px;
+  }
+
+  .api-input {
+    height: 40px;
+    padding: 8px 10px;
+    font-size: 14px; /* Prevents iOS zoom */
+  }
+
+  select.api-input {
+    height: 40px;
+  }
+
+  .api-input-wrap {
+    gap: 4px;
+  }
+
+  .api-toggle-btn,
+  .api-test-btn {
+    height: 40px;
+    min-width: 40px;
+    min-height: 44px;
+  }
+
+  .api-test-btn {
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  .github-oauth-btn {
+    height: 44px;
+    min-height: 44px;
+    font-size: 11px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .modal-actions .btn-primary,
+  .modal-actions .btn-secondary {
+    height: 44px;
+    width: 100%;
+    flex: none;
+    font-size: 11px;
+  }
+
+  .log-scroll-area {
+    max-height: 300px;
+  }
+
+  .approval-card {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .approval-actions {
+    gap: 6px;
+  }
+
+  .btn-approve,
+  .btn-reject {
+    flex: 1;
+    min-height: 40px;
+    justify-content: center;
+    padding: 8px 10px;
+  }
+}
+
+/* ── TABLET (768px - 1023px) ────────────────────────────────────– */
+@media (min-width: 768px) and (max-width: 1023px) {
+  #api-modal {
+    max-width: 520px;
+    max-height: 80vh;
+  }
+
+  .modal-section {
+    padding: 12px 14px;
+  }
+
+  .api-field {
+    margin-bottom: 10px;
+  }
+
+  .log-scroll-area {
+    max-height: 380px;
+  }
+
+  .approval-card {
+    padding: 14px;
+  }
+}
+
+/* ── DESKTOP (1024px+) ────────────────────────────────────────– */
+@media (min-width: 1024px) {
+  #api-modal {
+    max-width: 580px;
+    max-height: 85vh;
+  }
+
+  .modal-section {
+    padding: 14px 18px;
+  }
+
+  .api-field {
+    margin-bottom: 12px;
+  }
+
+  .log-scroll-area {
+    max-height: 520px;
+  }
+
+  .approval-card {
+    padding: 16px;
+  }
+}
+
+/* ── INPUT TOUCH OPTIMIZATION ────────────────────────────────────– */
+@media (hover: none) and (pointer: coarse) {
+  .api-input,
+  select.api-input,
+  input[type="text"],
+  input[type="password"],
+  textarea {
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .api-toggle-btn,
+  .api-test-btn,
+  .modal-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .log-filter-btn {
+    padding: 6px 10px;
+    min-height: 36px;
+  }
+
+  .github-oauth-btn {
+    min-height: 44px;
+  }
+}
+
+/* ── LANDSCAPE MODE (max-height: 600px) ────────────────────────– */
+@media (max-height: 600px) and (orientation: landscape) {
+  #api-modal {
+    max-height: calc(100dvh - 80px);
+  }
+
+  .modal-section {
+    padding: 8px 12px;
+  }
+
+  .log-scroll-area {
+    max-height: 200px;
+  }
+
+  .approval-card {
+    padding: 10px;
+    margin-bottom: 6px;
+  }
+}
+
+/* ── HIGH DPI DISPLAYS ──────────────────────────────────────────– */
+@media (min-resolution: 2dppx), (-webkit-min-device-pixel-ratio: 2) {
+  .api-input,
+  .modal-close,
+  .api-toggle-btn,
+  .api-test-btn {
+    border-width: 0.5px;
+  }
+
+  #api-modal {
+    border-width: 0.5px;
+  }
+}
+
+/* ── MODAL OVERLAY IMPROVEMENTS ────────────────────────────────– */
+@media (max-width: 767px) {
+  #api-modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  #api-modal {
+    border-radius: 12px 12px 0 0;
+  }
+}
+
+@media (min-width: 768px) {
+  #api-modal-overlay {
+    align-items: center;
+    padding: 20px;
+  }
+
+  #api-modal {
+    border-radius: 12px;
+  }
+}
+
+/* ── LOGS RESPONSIVE ────────────────────────────────────────────– */
+@media (max-width: 767px) {
+  .log-filters {
+    gap: 3px;
+  }
+
+  .log-filter-btn {
+    padding: 4px 6px;
+    font-size: 7px;
+  }
+
+  .log-entry {
+    gap: 4px;
+    padding: 3px 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .log-filters {
+    gap: 6px;
+  }
+
+  .log-filter-btn {
+    padding: 6px 10px;
+    font-size: 9px;
+  }
+}
+
+/* ── APPROVALS RESPONSIVE ──────────────────────────────────────– */
+@media (max-width: 767px) {
+  .approval-risk-badges {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .approval-card {
+    border-radius: 8px;
+  }
+
+  .btn-approve,
+  .btn-reject {
+    gap: 4px;
+    padding: 6px 8px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .approval-card {
+    border-radius: 12px;
+  }
+}
+
+/* ── GITHUB PANEL ITEMS RESPONSIVE ────────────────────────────– */
+@media (max-width: 767px) {
+  .commit-item {
+    padding: 6px 0;
+  }
+
+  .commit-sha {
+    font-size: 8px;
+  }
+
+  .commit-msg {
+    font-size: 9px;
+  }
+
+  .commit-meta {
+    font-size: 7px;
+  }
+
+  .diff-file {
+    padding: 3px;
+    font-size: 8px;
+  }
+
+  .repo-item {
+    padding: 6px;
+  }
+
+  .repo-item-name {
+    font-size: 9px;
+  }
+
+  .repo-item-meta {
+    font-size: 7px;
+  }
+}
+
